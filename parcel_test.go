@@ -60,6 +60,9 @@ func TestAddGetDelete(t *testing.T) {
 	// проверьте, что посылку больше нельзя получить из БД
 	err = store.Delete(id)
 	require.NoError(t, err)
+
+	_, err = store.Get(id)
+	require.Error(t, err)
 }
 
 // TestSetAddress проверяет обновление адреса
@@ -109,7 +112,7 @@ func TestSetStatus(t *testing.T) {
 
 	// set status
 	// обновите статус, убедитесь в отсутствии ошибки
-	newStatus := "new test status"
+	newStatus := ParcelStatusSent
 	err = store.SetStatus(id, newStatus)
 	require.NoError(t, err)
 
@@ -158,14 +161,13 @@ func TestGetByClient(t *testing.T) {
 	// get by client
 	storedParcels, err := store.GetByClient(client)
 	require.NoError(t, err)
-	assert.Equal(t, len(parcels), len(storedParcels))
+	assert.Len(t, storedParcels, len(parcels))
 
 	// check
-	for _, parcel := range storedParcels {
-		number := parcel.Number
-		assert.Equal(t, parcelMap[number], parcel)
-		// в parcelMap лежат добавленные посылки, ключ - идентификатор посылки, значение - сама посылка
-		// убедитесь, что все посылки из storedParcels есть в parcelMap
-		// убедитесь, что значения полей полученных посылок заполнены верно
-	}
+	assert.ElementsMatch(t, storedParcels, parcels)
+
+	// 	// в parcelMap лежат добавленные посылки, ключ - идентификатор посылки, значение - сама посылка
+	// 	// убедитесь, что все посылки из storedParcels есть в parcelMap
+	// 	// убедитесь, что значения полей полученных посылок заполнены верно
+	// }
 }
