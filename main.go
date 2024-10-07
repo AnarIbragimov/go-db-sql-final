@@ -12,6 +12,7 @@ const (
 	ParcelStatusRegistered = "registered"
 	ParcelStatusSent       = "sent"
 	ParcelStatusDelivered  = "delivered"
+	dataBase               = "tracker.db"
 )
 
 type Parcel struct {
@@ -57,7 +58,7 @@ func (s ParcelService) PrintClientParcels(client int) error {
 		return err
 	}
 
-	fmt.Printf("Посылки клиента %d:\n", client)
+	fmt.Printf("Посылки клиента № %d:\n", client)
 	for _, parcel := range parcels {
 		fmt.Printf("Посылка № %d на адрес %s от клиента с идентификатором %d зарегистрирована %s, статус %s\n",
 			parcel.Number, parcel.Address, parcel.Client, parcel.CreatedAt, parcel.Status)
@@ -98,8 +99,13 @@ func (s ParcelService) Delete(number int) error {
 
 func main() {
 	// настройте подключение к БД
+	db, err := sql.Open("sqlite", dataBase)
+	if err != nil {
+		fmt.Printf("ошибка подключения к БД: %s", err)
+		return
+	}
 
-	store := // создайте объект ParcelStore функцией NewParcelStore
+	store := NewParcelStore(db) // создайте объект ParcelStore функцией NewParcelStore
 	service := NewParcelService(store)
 
 	// регистрация посылки
